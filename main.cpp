@@ -6,9 +6,8 @@ int main(int argc, char *argv[])
     QCoreApplication a(argc, argv);
 
     //Step 1: Obtain the set of bags of features.
-
-    Utils::buildDictionary("C:\\Users\\DAT\\Desktop\\train_data\\", 200);
-
+    vector<KeyPoint> keypoints = Utils::buildDictionary(200);
+    Utils::trainClassesData(keypoints);
     return 0;
 }
 
