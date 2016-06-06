@@ -6,14 +6,14 @@ Utils::Utils()
 
 void Utils::buildDictionary()
 {
-    //To store the keypoints that will be extracted by SURF
+    //To store the keypoints that will be extracted by Sift
     vector<KeyPoint> keypoints;
-    //To store the SURF descriptor of current image
+    //To store the Sift descriptor of current image
     Mat descriptor;
     //To store all the descriptors that are extracted from all the images.
     Mat unclusteredFeatures;
 
-    SurfDescriptorExtractor detector;
+    SiftDescriptorExtractor detector;
 
     Mat image;
     for (int i = 1; i <= 400; ++i) {
@@ -54,10 +54,10 @@ void Utils::trainClassesData()
 
     //create a nearest neighbor matcher
     Ptr<DescriptorMatcher> matcher(new FlannBasedMatcher);
-    //create SURF feature point extracter
-    Ptr<FeatureDetector> detector(new SurfFeatureDetector());
-    //create SURF descriptor extractor
-    Ptr<DescriptorExtractor> extractor(new SurfDescriptorExtractor);
+    //create Sift feature point extracter
+    Ptr<FeatureDetector> detector(new SiftFeatureDetector());
+    //create Sift descriptor extractor
+    Ptr<DescriptorExtractor> extractor(new SiftDescriptorExtractor);
     //create BoW descriptor extractor
     BOWImgDescriptorExtractor bowIDE(extractor, matcher);
     //Set the dictionary with the vocabulary we created in the first step
@@ -70,23 +70,20 @@ void Utils::trainClassesData()
 
     Mat image;
     Mat labels(0, 1, CV_32FC1);
-    Mat trainingData(0, 200, CV_32FC1);
+    Mat trainingData(0, 400, CV_32FC1);
     vector<KeyPoint> keypoint;
     Mat bowDescriptor1;
 
-    SurfFeatureDetector surfDetector(500);
     //extracting histogram in the form of bow for each image
     for (int i = 1; i <= 400; ++i) {
 
         string filename = TRAIN_DATA_PATH + Utils::to_string(i) + ".jpg";
         image = imread(filename, CV_LOAD_IMAGE_GRAYSCALE);
-        surfDetector.detect(image, keypoint);
-
+        detector->detect(image, keypoint);
 
         bowIDE.compute(image, keypoint, bowDescriptor1);
 
         trainingData.push_back(bowDescriptor1);
-
         labels.push_back((float) i);
     }
 
@@ -106,32 +103,22 @@ void Utils::trainClassesData()
         printf("trained SVMs\n");
     }
 
-    printf("Processing evaluation data...\n");
 
-
-    Mat groundTruth(0, 1, CV_32FC1);
-    Mat evalData(0, 200, CV_32FC1);
     vector<KeyPoint> keypoint2;
     Mat bowDescriptor2;
-    Mat results(0, 1, CV_32FC1);;
-    for (int i = 1; i <= 200; ++i) {
-        string filename = TEST_DATA_PATH + Utils::to_string(i) + ".jpg";
-        image = imread(filename, CV_LOAD_IMAGE_GRAYSCALE);
+    printf("Testing image...\n");
+    string filename ="C:\\Users\\DAT\\Desktop\\test.jpg";
+    image = imread(filename, CV_LOAD_IMAGE_GRAYSCALE);
+    detector->detect(image, keypoint2);
 
-        surfDetector.detect(image, keypoint2);
-        bowIDE.compute(image, keypoint2, bowDescriptor2);
+    detector->detect(image, keypoint2);
+    bowIDE.compute(image, keypoint2, bowDescriptor2);
 
-        evalData.push_back(bowDescriptor2);
-        groundTruth.push_back((float) i);
-        float response = svm.predict(bowDescriptor2);
-        results.push_back(response);
-        printf("img%d: %f\n",i, response);
-    }
+    float response = svm.predict(bowDescriptor2);
+    printf("result: %f\n", response);
+    imshow( "window1", image );
+    waitKey(0);
 
-
-    //calculate the number of unmatched classes
-    double errorRate = (double) countNonZero(groundTruth- results) / evalData.rows;
-    printf("Error rate: %f\n",errorRate);
 }
 
 
