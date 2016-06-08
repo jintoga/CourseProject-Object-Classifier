@@ -9,10 +9,9 @@ using namespace cv;
 using namespace std;
 
 #define VOCABULARY "vocabulary"
-#define TRAIN_DATA_PATH "C:\\Users\\DAT\\Desktop\\train_data\\"
-#define DICTIONARY_PATH "C:\\Users\\DAT\\Desktop\\train_data\\dictionary.yml"
-#define DESCRIPTOR_PATH "C:\\Users\\DAT\\Desktop\\train_data\\descriptor.yml"
-#define TEST_DATA_PATH "C:\\Users\\DAT\\Desktop\\train_data\\test\\"
+#define TRAIN_DATA_PATH "C:\\Users\\Nguyen\\Desktop\\train_data\\"
+#define DICTIONARY_PATH "C:\\Users\\Nguyen\\Desktop\\train_data\\dictionary.yml"
+#define TEST_DATA_PATH "C:\\Users\\Nguyen\\Desktop\\test_org\\"
 
 class Utils
 {

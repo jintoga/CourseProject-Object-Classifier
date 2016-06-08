@@ -6,27 +6,29 @@ Utils::Utils()
 
 void Utils::buildDictionary()
 {
-    //To store the keypoints that will be extracted by SURF
+    //To store the keypoints that will be extracted by Sift
     vector<KeyPoint> keypoints;
-    //To store the SURF descriptor of current image
+    //To store the Sift descriptor of current image
     Mat descriptor;
     //To store all the descriptors that are extracted from all the images.
     Mat unclusteredFeatures;
 
-    SurfDescriptorExtractor detector;
+    SiftDescriptorExtractor detector;
 
     Mat image;
-    for (int i = 1; i <= 400; ++i) {
-        //create the file name of an image
-        string filename = TRAIN_DATA_PATH + Utils::to_string(i) + ".jpg";
-        //open the file
-        image = imread(filename, CV_LOAD_IMAGE_GRAYSCALE);
-        detector.detect(image, keypoints);
-        //compute the descriptors for each keypoint
-        detector.compute(image, keypoints,descriptor);
-        //put the all feature descriptors in a single Mat object
-        unclusteredFeatures.push_back(descriptor);
-        printf("extracted: %s(%dx%d)\n", filename.c_str(), image.size().width, image.size().height);
+    for (int i = 1; i <= 4; ++i) {
+        for (int j = 1; j <= 100; ++j) {
+            //create the file name of an image
+            string filename = TRAIN_DATA_PATH + Utils::to_string(j) + "-" + Utils::to_string(i) + ".jpg";
+            //open the file
+            image = imread(filename, CV_LOAD_IMAGE_GRAYSCALE);
+            detector.detect(image, keypoints);
+            //compute the descriptors for each keypoint
+            detector.compute(image, keypoints,descriptor);
+            //put the all feature descriptors in a single Mat object
+            unclusteredFeatures.push_back(descriptor);
+            printf("extracted: %s(%dx%d)\n", filename.c_str(), image.size().width, image.size().height);
+        }
     }
     //Construct BOWKMeansTrainer
     //define Term Criteria
@@ -34,9 +36,12 @@ void Utils::buildDictionary()
     //retries number
     int retries = 1;
     //Create the BoW trainer
+    printf("Clustering features...\n");
     BOWKMeansTrainer bowTrainer(CLUSTERS_NUM, termCriteria, retries, KMEANS_PP_CENTERS);
     //cluster the feature vectors
     Mat dictionary = bowTrainer.cluster(unclusteredFeatures);
+    printf("Done clustering features.\n");
+    printf("Creating Dictionary File...\n");
     //store the vocabulary
     FileStorage fs(DICTIONARY_PATH, FileStorage::WRITE);
     fs << VOCABULARY << dictionary;
@@ -54,10 +59,10 @@ void Utils::trainClassesData()
 
     //create a nearest neighbor matcher
     Ptr<DescriptorMatcher> matcher(new FlannBasedMatcher);
-    //create SURF feature point extracter
-    Ptr<FeatureDetector> detector(new SurfFeatureDetector());
-    //create SURF descriptor extractor
-    Ptr<DescriptorExtractor> extractor(new SurfDescriptorExtractor);
+    //create Sift feature point extracter
+    Ptr<FeatureDetector> detector(new SiftFeatureDetector());
+    //create Sift descriptor extractor
+    Ptr<DescriptorExtractor> extractor(new SiftDescriptorExtractor);
     //create BoW descriptor extractor
     BOWImgDescriptorExtractor bowIDE(extractor, matcher);
     //Set the dictionary with the vocabulary we created in the first step
@@ -74,22 +79,25 @@ void Utils::trainClassesData()
     vector<KeyPoint> keypoint;
     Mat bowDescriptor1;
 
-    SurfFeatureDetector surfDetector(500);
+    SiftFeatureDetector SiftDetector(1500);
+    printf("Extracting histograms\n");
     //extracting histogram in the form of bow for each image
-    for (int i = 1; i <= 400; ++i) {
+    for (int i = 1; i <= 4; ++i) {
+        for (int j = 1; j <= 100; ++j) {
 
-        string filename = TRAIN_DATA_PATH + Utils::to_string(i) + ".jpg";
-        image = imread(filename, CV_LOAD_IMAGE_GRAYSCALE);
-        surfDetector.detect(image, keypoint);
+            string filename = TRAIN_DATA_PATH + Utils::to_string(j) + "-" + Utils::to_string(i) + ".jpg";
+            image = imread(filename, CV_LOAD_IMAGE_GRAYSCALE);
+            SiftDetector.detect(image, keypoint);
 
+            bowIDE.compute(image, keypoint, bowDescriptor1);
 
-        bowIDE.compute(image, keypoint, bowDescriptor1);
+            trainingData.push_back(bowDescriptor1);
 
-        trainingData.push_back(bowDescriptor1);
-
-        labels.push_back((float) i);
+            labels.push_back((float) i);
+        }
     }
 
+    printf("Done extracting histograms\n");
     //Setting up SVM parameters
     CvSVMParams params;
     params.kernel_type=CvSVM::RBF;
@@ -98,40 +106,59 @@ void Utils::trainClassesData()
     params.C=312.50000000000000;
     params.term_crit=cvTermCriteria(CV_TERMCRIT_ITER, 100, 0.000001);
     CvSVM svm;
-    printf("%s\n","Training SVM classifier");
+    printf("Training SVM classifier\n");
 
     bool res=svm.train(trainingData, labels, cv::Mat(), cv::Mat(), params);
 
     if(res){
-        printf("trained SVMs\n");
+        printf("Done training SVMs\n");
     }
 
-    printf("Processing evaluation data...\n");
-
-
-    Mat groundTruth(0, 1, CV_32FC1);
-    Mat evalData(0, 200, CV_32FC1);
     vector<KeyPoint> keypoint2;
     Mat bowDescriptor2;
-    Mat results(0, 1, CV_32FC1);;
-    for (int i = 1; i <= 200; ++i) {
-        string filename = TEST_DATA_PATH + Utils::to_string(i) + ".jpg";
-        image = imread(filename, CV_LOAD_IMAGE_GRAYSCALE);
 
-        surfDetector.detect(image, keypoint2);
+    printf("Start testing images...\n");
+    for (int i = 1; i <= 400; ++i) {
+
+        string filename = TEST_DATA_PATH + Utils::to_string(i) +  ".jpg";
+
+        image = imread(filename, CV_LOAD_IMAGE_GRAYSCALE);
+        detector->detect(image, keypoint2);
+
+        detector->detect(image, keypoint2);
         bowIDE.compute(image, keypoint2, bowDescriptor2);
 
-        evalData.push_back(bowDescriptor2);
-        groundTruth.push_back((float) i);
         float response = svm.predict(bowDescriptor2);
-        results.push_back(response);
-        printf("img%d: %f\n",i, response);
+
+        string className;
+        if(response == 1){
+            className = "Plane";
+        }
+        else if(response == 2){
+            className = "Car";
+        }
+        else if(response == 3){
+            className = "Face";
+        }
+        else if(response == 4){
+            className = "Mobike";
+        }
+
+
+        printf("This is an image of: %s\n", className.c_str());
+        imshow("Testing", image );
+        resizeWindow("Testing",600,600);
+
+        waitKey(0);
+
+        Mat cleaner(Mat(600, 600, CV_8U));
+        cleaner = cv::Scalar(0);
+        imshow("Testing", cleaner);
     }
 
 
-    //calculate the number of unmatched classes
-    double errorRate = (double) countNonZero(groundTruth- results) / evalData.rows;
-    printf("Error rate: %f\n",errorRate);
+    printf("Done testing images.\n");
+    waitKey(0);
 }
 
 
