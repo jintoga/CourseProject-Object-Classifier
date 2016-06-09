@@ -4,14 +4,15 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/nonfree/features2d.hpp>
 #include <string>
+#include <random>
 
 using namespace cv;
 using namespace std;
 
 #define VOCABULARY "vocabulary"
-#define TRAIN_DATA_PATH "C:\\Users\\Nguyen\\Desktop\\train_data\\"
-#define DICTIONARY_PATH "C:\\Users\\Nguyen\\Desktop\\train_data\\dictionary.yml"
-#define TEST_DATA_PATH "C:\\Users\\Nguyen\\Desktop\\test_org\\"
+#define TRAIN_DATA_PATH "C:\\Users\\Nguyen\\Desktop\\tr\\"
+#define DICTIONARY_PATH "C:\\Users\\Nguyen\\Desktop\\tr\\dictionary.yml"
+#define TEST_DATA_PATH "C:\\Users\\Nguyen\\Desktop\\test1\\"
 
 class Utils
 {

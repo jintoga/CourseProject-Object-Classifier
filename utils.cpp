@@ -17,7 +17,7 @@ void Utils::buildDictionary()
 
     Mat image;
     for (int i = 1; i <= 4; ++i) {
-        for (int j = 1; j <= 100; ++j) {
+        for (int j = 1; j <= 60; ++j) {
             //create the file name of an image
             string filename = TRAIN_DATA_PATH + Utils::to_string(j) + "-" + Utils::to_string(i) + ".jpg";
             //open the file
@@ -83,7 +83,7 @@ void Utils::trainClassesData()
     printf("Extracting histograms\n");
     //extracting histogram in the form of bow for each image
     for (int i = 1; i <= 4; ++i) {
-        for (int j = 1; j <= 100; ++j) {
+        for (int j = 1; j <= 60; ++j) {
 
             string filename = TRAIN_DATA_PATH + Utils::to_string(j) + "-" + Utils::to_string(i) + ".jpg";
             image = imread(filename, CV_LOAD_IMAGE_GRAYSCALE);
@@ -118,7 +118,7 @@ void Utils::trainClassesData()
     Mat bowDescriptor2;
 
     printf("Start testing images...\n");
-    for (int i = 1; i <= 400; ++i) {
+    for (int i = 1; i <= 89; ++i) {
 
         string filename = TEST_DATA_PATH + Utils::to_string(i) +  ".jpg";
 
@@ -138,7 +138,7 @@ void Utils::trainClassesData()
             className = "Car";
         }
         else if(response == 3){
-            className = "Face";
+            className = "Cat";
         }
         else if(response == 4){
             className = "Mobike";
