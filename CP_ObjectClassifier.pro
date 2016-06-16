@@ -4,26 +4,27 @@ QT -= gui
 TARGET = CP_ObjectClassifier
 CONFIG += console
 CONFIG -= app_bundle
+CONFIG += c++11
 
 TEMPLATE = app
 
 SOURCES += main.cpp \
     utils.cpp
 
-INCLUDEPATH += D://opencv//opencv//build//include
-LIBS += "D://opencv//opencv//builded-lib//lib//libopencv_calib3d_pch_dephelp.a"
-LIBS += "D://opencv//opencv//builded-lib//lib//libopencv_core249.dll.a"
-LIBS += "D://opencv//opencv//builded-lib//lib//libopencv_features2d249.dll.a"
-LIBS += "D://opencv//opencv//builded-lib//lib//libopencv_flann249.dll.a"
-LIBS += "D://opencv//opencv//builded-lib//lib//libopencv_gpu249.dll.a"
-LIBS += "D://opencv//opencv//builded-lib//lib//libopencv_highgui249.dll.a"
-LIBS += "D://opencv//opencv//builded-lib//lib//libopencv_imgproc249.dll.a"
-LIBS += "D://opencv//opencv//builded-lib//lib//libopencv_legacy249.dll.a"
-LIBS += "D://opencv//opencv//builded-lib//lib//libopencv_ml249.dll.a"
-LIBS += "D://opencv//opencv//builded-lib//lib//libopencv_nonfree249.dll.a"
-LIBS += "D://opencv//opencv//builded-lib//lib//libopencv_objdetect249.dll.a"
-LIBS += "D://opencv//opencv//builded-lib//lib//libopencv_ocl249.dll.a"
-LIBS += "D://opencv//opencv//builded-lib//lib//libopencv_photo249.dll.a"
+INCLUDEPATH += C://Users//DAT//Desktop//opencv//build//include
+LIBS += C://Users//DAT//Desktop//opencv//cmake-debug//lib//libopencv_calib3d_pch_dephelp.a
+LIBS += C://Users//DAT//Desktop//opencv//cmake-debug//lib//libopencv_core2411.dll.a
+LIBS += C://Users//DAT//Desktop//opencv//cmake-debug//lib//libopencv_features2d2411.dll.a
+LIBS += C://Users//DAT//Desktop//opencv//cmake-debug//lib//libopencv_flann2411.dll.a
+LIBS += C://Users//DAT//Desktop//opencv//cmake-debug//lib//libopencv_gpu2411.dll.a
+LIBS += C://Users//DAT//Desktop//opencv//cmake-debug//lib//libopencv_highgui2411.dll.a
+LIBS += C://Users//DAT//Desktop//opencv//cmake-debug//lib//libopencv_imgproc2411.dll.a
+LIBS += C://Users//DAT//Desktop//opencv//cmake-debug//lib//libopencv_legacy2411.dll.a
+LIBS += C://Users//DAT//Desktop//opencv//cmake-debug//lib//libopencv_ml2411.dll.a
+LIBS += C://Users//DAT//Desktop//opencv//cmake-debug//lib//libopencv_nonfree2411.dll.a
+LIBS += C://Users//DAT//Desktop//opencv//cmake-debug//lib//libopencv_objdetect2411.dll.a
+LIBS += C://Users//DAT//Desktop//opencv//cmake-debug//lib//libopencv_ocl2411.dll.a
+LIBS += C://Users//DAT//Desktop//opencv//cmake-debug//lib//libopencv_photo2411.dll.a
 
 HEADERS += \
     utils.h
