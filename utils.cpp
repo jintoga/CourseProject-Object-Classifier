@@ -57,13 +57,8 @@ void Utils::trainClassesData()
     fs[VOCABULARY] >> dictionary;
     fs.release();
 
-    //create a nearest neighbor matcher
     Ptr<DescriptorMatcher> matcher(new FlannBasedMatcher);
-    //create Sift feature point extracter
-    Ptr<FeatureDetector> detector(new SiftFeatureDetector());
-    //create Sift descriptor extractor
     Ptr<DescriptorExtractor> extractor(new SiftDescriptorExtractor);
-    //create BoW descriptor extractor
     BOWImgDescriptorExtractor bowIDE(extractor, matcher);
     //Set the dictionary with the vocabulary we created in the first step
     bowIDE.setVocabulary(dictionary);
@@ -105,20 +100,34 @@ void Utils::trainClassesData()
     params.gamma=0.50625000000000009;
     params.C=312.50000000000000;
     params.term_crit=cvTermCriteria(CV_TERMCRIT_ITER, 100, 0.000001);
+
     CvSVM svm;
     printf("Training SVM classifier\n");
-
-    bool res=svm.train(trainingData, labels, cv::Mat(), cv::Mat(), params);
+    bool res = svm.train(trainingData, labels, cv::Mat(), cv::Mat(), params);
 
     if(res){
         printf("Done training SVMs\n");
+
+        //Testing data
+        Utils::testData(bowIDE, svm);
+    }else{
+        printf("Error training SVMs!!!\n");
     }
+
+
+}
+
+void Utils::testData(BOWImgDescriptorExtractor &bowIDE, CvSVM &svm)
+{
+
+    Ptr<FeatureDetector> detector(new SiftFeatureDetector());
+    Mat image;
 
     vector<KeyPoint> keypoint2;
     Mat bowDescriptor2;
 
     printf("Start testing images...\n");
-    for (int i = 1; i <= 89; ++i) {
+    for (int i = 1; i <= 80; ++i) {
 
         string filename = TEST_DATA_PATH + Utils::to_string(i) +  ".jpg";
 
@@ -138,7 +147,7 @@ void Utils::trainClassesData()
             className = "Car";
         }
         else if(response == 3){
-            className = "Cat";
+            className = "Leopard";
         }
         else if(response == 4){
             className = "Mobike";

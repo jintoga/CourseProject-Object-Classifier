@@ -10,14 +10,15 @@ using namespace cv;
 using namespace std;
 
 #define VOCABULARY "vocabulary"
-#define TRAIN_DATA_PATH "C:\\Users\\Nguyen\\Desktop\\tr\\"
-#define DICTIONARY_PATH "C:\\Users\\Nguyen\\Desktop\\tr\\dictionary.yml"
-#define TEST_DATA_PATH "C:\\Users\\Nguyen\\Desktop\\test1\\"
+#define TRAIN_DATA_PATH "C:\\Users\\Nguyen\\Desktop\\train_data\\"
+#define DICTIONARY_PATH "C:\\Users\\Nguyen\\Desktop\\train_data\\dictionary.yml"
+#define TEST_DATA_PATH "C:\\Users\\Nguyen\\Desktop\\test_data\\"
 
 class Utils
 {
 private:
     const static int CLUSTERS_NUM = 100; //dictionary size
+    void static testData(BOWImgDescriptorExtractor &bowIDE, CvSVM &svm);
 public:
     Utils();
     void static buildDictionary();
